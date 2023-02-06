@@ -1,11 +1,19 @@
 window.sistemas = {
     SIGITM_TA: [
-        '123.123.123.123',
-        '234.234.234.234'
+        {'Weblogic':
+            ['123.123.123.123', '245.255.248.10'], 
+        'Descrição':
+            ['brtsp01teste', 'brtsp01teste']
+        },
+        {'Banco de dados':'123.123.123.123', 'Descrição':'Teste'},
     ],
     SIGITM_TI: [
-        '345.345.345.345',
-        '456.456.456.456'
+        {'Weblogic':
+            ['123.123.123.123', '245.255.248.10'], 
+        'Descrição':
+            ['brtsp01teste', 'brtsp01teste']
+        },
+        {'Banco de dados':'123.123.123.123', 'Descrição':'Teste'},
     ]
 };
 
@@ -24,11 +32,7 @@ window.servidores = function() {
     let sistemas = window.getSelectedValues();
     let servers = [];
     sistemas.forEach(s => {adicionar(servers, s)});
-    let result = "";
-    for (let key in servers) {
-        result += key + ": " + servers[key] + "\n";
-    }
-    return result;
+    return servers;
 };
 
 

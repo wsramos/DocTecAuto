@@ -13,7 +13,7 @@
 <body>
     <div class="container">
 
-        <form class="row card mt-5 needs-validation" onsubmit="jsPDF:salvar();">
+        <form class="row card mt-5 needs-validation" onsubmit="start_functions:window.initFunctions();">
             <h1 class="card-header">DOCUMENTO TÉCNICO AUTO</h1>
             <div class="card-body">
                 <div class="col-12 card">
@@ -24,10 +24,10 @@
                             <div class="col-6">
                                 <!-- Área de preenchimento dos dados Indra -->
                                 <label for="solicitante" class="form-label"> Solicitante Indra:</label>
-                                <input id="solicitante" type="text" class="form-control" placeholder="Nome completo" >
+                                <input id="solicitante" type="text" class="form-control" placeholder="Nome completo" required>
 
                                 <label for="contatoIndra" class="form-label"> Contato:</label>
-                                <input id="contatoIndra" type="text" class="form-control" placeholder="(00) 00000-0000" >
+                                <input id="contatoIndra" type="text" class="form-control" placeholder="(00) 00000-0000" required>
                                 
                                 <label for="emailIndra" class="form-label"> Email:</label>
                                 <div class="input-group mb-3">
@@ -39,14 +39,14 @@
                             <div class="col-6">
                                 <!-- Área de preenchimento dos dados Vivo -->
                                 <label for="solicitanteVivo" class="form-label"> Nome Solicitante Vivo:</label>
-                                <input id="solicitanteVivo" type="text" class="form-control" placeholder="Nome completo" >
+                                <input id="solicitanteVivo" type="text" class="form-control" placeholder="Nome completo" required>
 
                                 <label for="contatoVivo" class="form-label"> Contato:</label>
-                                <input id="contatoVivo" type="text" class="form-control" placeholder="(00) 00000-0000" >
+                                <input id="contatoVivo" type="text" class="form-control" placeholder="(00) 00000-0000" required>
 
                                 <label for="emailVivo" class="form-label"> Email:</label>
                                 <div class="input-group mb-3">
-                                    <input id="emailVivo" type="text" class="form-control" >
+                                    <input id="emailVivo" type="text" class="form-control" required>
                                     <span class="input-group-text" id="basic-addon2">@example.com</span>
                                 </div>
                                 <!-- Área de preenchimento dos dados Vivo -->
@@ -60,15 +60,15 @@
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label for="rolloutInicio" class="form-label"> Data de rollout (início):</label>
-                                <input id="rolloutInicio" type="datetime-local" class="form-control">
+                                <input id="rolloutInicio" type="datetime-local" class="form-control" required>
                                 <label for="rolloutFim" class="form-label"> Data de rollout (fim):</label>
-                                <input id="rolloutFim" type="datetime-local" class="form-control">
+                                <input id="rolloutFim" type="datetime-local" class="form-control" required>
                             </div>
                             <div class="col-6">
                                 <label for="rollbackInicio" class="form-label"> Data de rollback (início):</label>
-                                <input id="rollbackInicio" type="datetime-local" class="form-control">
+                                <input id="rollbackInicio" type="datetime-local" class="form-control" required>
                                 <label for="rollbackFim" class="form-label"> Data de rollback (fim):</label>
-                                <input id="rollbackFim" type="datetime-local" class="form-control">
+                                <input id="rollbackFim" type="datetime-local" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -78,14 +78,15 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col" id="sistemas">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                <div id="erroSistemas" style="display: none" class="text-danger">Obrigatório informar ao menos um sistema.</div>
+                                <div class="form-check checkSist">
+                                    <input class="form-check-input checkSist" type="checkbox" value="SIGITM_TI" id="flexCheckDefault" required>
                                     <label class="form-check-label" for="flexCheckDefault">
-                                    Default checkbox
+                                    SIGITM_TI
                                     </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="SIGITM_TA" id="flexCheckChecked">
+                                <div class="form-check checkSist">
+                                    <input class="form-check-input checkSist" type="checkbox" value="SIGITM_TA" id="flexCheckChecked" required>
                                     <label class="form-check-label" for="flexCheckChecked">
                                     SIGITM_TA
                                     </label>
@@ -102,30 +103,51 @@
 
     </div>
 
-    <script src="js/jsPDF.js"></script>
     <script src="js/servidores.js"></script>
+    <script src="js/secoes_doc.js"></script>
+    <script src="js/jsPDF.js"></script>
+    <script src="js/start_functions.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
         crossorigin="anonymous"></script>
     <script>
         (() => {
-                    'use strict'
+                'use strict';
 
-                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                    const forms = document.querySelectorAll('.needs-validation')
+                const forms = document.querySelectorAll('.needs-validation');
+                const checkboxes = document.getElementsByClassName("checkSist");
+                const isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
 
-                    // Loop over them and prevent submission
-                    Array.from(forms).forEach(form => {
-                        form.addEventListener('submit', event => {
-                        if (!form.checkValidity()) {
-                            event.preventDefault()
-                            event.stopPropagation()
+                
+                    for (let i = 0; i < checkboxes.length; i++) {
+                        checkboxes[i].addEventListener("change", function() {
+                        if (Array.from(checkboxes).some(checkbox => checkbox.checked)) {
+                            for (let j = 0; j < checkboxes.length; j++) {
+                                checkboxes[j].removeAttribute("required");
+                            }
                         }
+                        });
+                    }
 
-                        form.classList.add('was-validated')
-                        }, false)
-                    })
-                })()
+                Array.from(forms).forEach(form => {
+                    form.addEventListener('submit', event => {
+                    
+                    if(!Array.from(checkboxes).some(checkbox => checkbox.checked)){
+                        for (let j = 0; j < checkboxes.length; j++) {
+                            checkboxes[j].setAttribute("required","required");
+                        }
+                        document.getElementById("erroSistemas").style.display = 'block';
+                    };
+
+                    if (!form.checkValidity() || !Array.from(checkboxes).some(checkbox => checkbox.checked)) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                    }, false);
+                });
+            })();
+
     </script>
 </body>
 
